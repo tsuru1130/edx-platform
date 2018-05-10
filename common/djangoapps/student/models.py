@@ -104,6 +104,7 @@ UNENROLLED_TO_ENROLLED = 'from unenrolled to enrolled'
 ALLOWEDTOENROLL_TO_UNENROLLED = 'from allowed to enroll to enrolled'
 UNENROLLED_TO_UNENROLLED = 'from unenrolled to unenrolled'
 DEFAULT_TRANSITION_STATE = 'N/A'
+SCORE_RECALCULATION_DELAY_ON_ENROLLMENT_UPDATE = 30
 
 TRANSITION_STATES = (
     (UNENROLLED_TO_ALLOWEDTOENROLL, UNENROLLED_TO_ALLOWEDTOENROLL),
@@ -1358,7 +1359,12 @@ class CourseEnrollment(models.Model):
             # Only emit mode change events when the user's enrollment
             # mode has changed from its previous setting
             self.emit_event(EVENT_NAME_ENROLLMENT_MODE_CHANGED)
-            ENROLLMENT_TRACK_UPDATED.send(sender=None, user=self.user, course_key=self.course_id)
+            ENROLLMENT_TRACK_UPDATED.send(
+                sender='ENROLLMENT_TRACK_UPDATED',
+                user=self.user,
+                course_key=self.course_id,
+                countdown=SCORE_RECALCULATION_DELAY_ON_ENROLLMENT_UPDATE
+            )
 
     def send_signal(self, event, cost=None, currency=None):
         """

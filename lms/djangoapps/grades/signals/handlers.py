@@ -239,14 +239,16 @@ def recalculate_course_grade_only(sender, course, course_structure, user, **kwar
     CourseGradeFactory().update(user, course=course, course_structure=course_structure)
 
 
-@receiver(ENROLLMENT_TRACK_UPDATED)
 @receiver(COHORT_MEMBERSHIP_UPDATED)
-def recalculate_course_and_subsection_grades(sender, user, course_key, **kwargs):
+@receiver(ENROLLMENT_TRACK_UPDATED)
+def recalculate_course_and_subsection_grades(sender, user, course_key, countdown=None, **kwargs):
     """
     Updates a saved course grade, forcing the subsection grades
     from which it is calculated to update along the way.
     """
+    log.info("--------------------sender : %s------------------", sender)
     recalculate_course_and_subsection_grades_for_user.apply_async(
+        countdown=countdown,
         kwargs=dict(
             user_id=user.id,
             course_key=six.text_type(course_key)

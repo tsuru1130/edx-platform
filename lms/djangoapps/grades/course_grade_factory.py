@@ -13,7 +13,7 @@ from .config import assume_zero_if_absent, should_persist_grades
 from .course_data import CourseData
 from .course_grade import CourseGrade, ZeroCourseGrade
 from .models import PersistentCourseGrade, prefetch
-
+from openedx.core.djangoapps.course_groups.cohorts import get_cohort
 log = getLogger(__name__)
 
 
@@ -177,7 +177,14 @@ class CourseGradeFactory(object):
             course_data,
             force_update_subsections=force_update_subsections
         )
+
+        group = get_cohort(user, course_data.course_key, assign=False, use_cached=True)
+
+        log.info("---------------cohort in factory : %s---------------", group)
+        log.info("course_grade.attempted before update : %s", course_grade.attempted)
         course_grade = course_grade.update()
+        log.info("course_grade.attempted after update : %s", course_grade.attempted)
+
 
         should_persist = should_persist and course_grade.attempted
         if should_persist:
