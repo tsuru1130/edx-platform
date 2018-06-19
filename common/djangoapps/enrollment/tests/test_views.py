@@ -1323,17 +1323,13 @@ class UnenrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase):
     def test_deactivate_enrollments_empty_username(self):
         self._assert_active()
         response = self._submit_unenroll(self.superuser, "")
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        data = json.loads(response.content)
-        self.assertEqual(data, u'The user "" does not exist.')
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self._assert_active()
 
     def test_deactivate_enrollments_invalid_username(self):
         self._assert_active()
         response = self._submit_unenroll(self.superuser, "a made up username")
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        data = json.loads(response.content)
-        self.assertEqual(data, u'The user "a made up username" does not exist.')
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self._assert_active()
 
     def test_deactivate_enrollments_called_twice(self):
@@ -1341,7 +1337,7 @@ class UnenrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase):
         response = self._submit_unenroll(self.superuser, self.user.username)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         response = self._submit_unenroll(self.superuser, self.user.username)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(response.content, "")
         self._assert_inactive()
 

@@ -1177,14 +1177,6 @@ class TestAccountRetirementPost(RetirementTestCase):
         }
         self.assertEqual(expected_user_profile_pii, USER_PROFILE_PII)
 
-    def test_retire_user_where_user_does_not_exist(self):
-        path = 'openedx.core.djangoapps.user_api.accounts.views.is_username_retired'
-        with mock.patch(path, return_value=False) as mock_retired_username:
-            data = {'username': 'not_a_user'}
-            response = self.post_and_assert_status(data, status.HTTP_404_NOT_FOUND)
-            self.assertFalse(response.content)
-            mock_retired_username.assert_called_once_with('not_a_user')
-
     def test_retire_user_server_error_is_raised(self):
         path = 'openedx.core.djangoapps.user_api.models.UserRetirementStatus.get_retirement_for_retirement_action'
         with mock.patch(path, side_effect=Exception('Unexpected Exception')) as mock_get_retirement:
@@ -1197,9 +1189,9 @@ class TestAccountRetirementPost(RetirementTestCase):
         path = 'openedx.core.djangoapps.user_api.accounts.views.is_username_retired'
         with mock.patch(path, return_value=True) as mock_is_username_retired:
             data = {'username': self.test_user.username}
-            response = self.post_and_assert_status(data, status.HTTP_404_NOT_FOUND)
+            response = self.post_and_assert_status(data, status.HTTP_204_NO_CONTENT)
             self.assertFalse(response.content)
-            mock_is_username_retired.assert_called_once_with(self.original_username)
+            mock_is_username_retired.assert_not_called()
 
     def test_retire_user_where_username_not_provided(self):
         response = self.post_and_assert_status({}, status.HTTP_404_NOT_FOUND)
