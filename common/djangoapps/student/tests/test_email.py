@@ -150,6 +150,7 @@ class ActivationEmailTests(CacheIsolationTestCase):
         for fragment in body_fragments:
             self.assertIn(fragment, msg.body)
 
+    @unittest.skip("ENT-1028")
     @patch('student.tasks.log')
     def test_send_email_to_inactive_user(self, mock_log):
         """

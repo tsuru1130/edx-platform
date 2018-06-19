@@ -32,7 +32,7 @@ def inactive_user_view(request):
     # in a course. Otherwise, just redirect them to the dashboard, which displays a message
     # about activating their account.
     profile = UserProfile.objects.get(user=request.user)
-    compose_and_send_activation_email(request.user, profile)
+    # compose_and_send_activation_email(request.user, profile) # Disabled as required by ENT-1028
     return redirect(request.GET.get('next', 'dashboard'))
 
 
