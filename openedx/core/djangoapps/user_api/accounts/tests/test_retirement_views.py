@@ -1243,6 +1243,11 @@ class TestAccountRetirementPost(RetirementTestCase):
         self.assertFalse(CourseEnrollmentAllowed.objects.filter(email=self.original_email).exists())
         self.assertFalse(UnregisteredLearnerCohortAssignments.objects.filter(email=self.original_email).exists())
 
+    def test_retire_user_twice_idempotent(self):
+        data = {'username': self.original_username}
+        self.post_and_assert_status(data)
+        self.post_and_assert_status(data)
+
     def test_deletes_pii_from_user_profile(self):
         for model_field, value_to_assign in USER_PROFILE_PII.iteritems():
             if value_to_assign == '':
@@ -1468,3 +1473,10 @@ class TestLMSAccountRetirementPost(RetirementTestCase, ModuleStoreTestCase):
         self.assertEqual(retired_api_access_request.company_name, '')
         self.assertEqual(retired_api_access_request.reason, '')
         self.assertEqual(SurveyAnswer.objects.get(user=self.test_user).field_value, '')
+
+    def test_retire_user_twice_idempotent(self):
+        # check that a second call to the retire_misc endpoint will work
+        UserRetirementStatus.get_retirement_for_retirement_action(self.test_user.username)
+        data = {'username': self.original_username}
+        self.post_and_assert_status(data)
+        self.post_and_assert_status(data)
