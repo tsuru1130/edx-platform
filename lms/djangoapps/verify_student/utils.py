@@ -97,6 +97,9 @@ def most_recent_verification(photo_id_verifications, sso_id_verifications, manua
     """
     Return the most recent verification given querysets for photo, sso and manual verifications.
 
+    This function creates a map of the latest verification of all types and then returns the earliest
+    verification using the max of the map values.
+
     Arguments:
         photo_id_verifications: Queryset containing photo verifications
         sso_id_verifications: Queryset containing sso verifications
